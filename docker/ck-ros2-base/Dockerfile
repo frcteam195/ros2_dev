@@ -56,6 +56,13 @@ RUN mkdir -p /ros/ros2_${ROS_VER}/src \
 RUN cd /ros/ros2_${ROS_VER} \
 	&& colcon build --symlink-install
 
+RUN apt-get update \
+	&& apt-get install -y rsync \
+	&& mkdir -p /opt/ros/${ROS_VER} \
+	&& cd /ros/ros2_${ROS_VER}/install \
+	&& for d in *; do ; if [[ -d "${d}" && ! -L "${d}" ]]; then ; echo "Processing ${d}..." ; rsync -a "${d}/" "/opt/ros/${ROS_VER}/" ; echo "Completed processing ${d}!" ; fi ; done ; \
+	&& rm -rf /var/lib/apt/lists/*
+
 # RUN git clone https://github.com/stiffstream/sobjectizer \
 # 	&& cd /tmp/sobjectizer \
 # 	&& git checkout 972b5310b7a486dd4d4322ffb46f1c7e15c47ef6 \
