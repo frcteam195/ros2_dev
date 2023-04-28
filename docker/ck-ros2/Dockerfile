@@ -45,7 +45,7 @@ RUN mkdir -p /tmp/catkin_ws/src \
 	&& rosdep install --from-paths src --ignore-src -r -y --skip-keys 'robot_localization angles diagnostic_updater geographic_msgs' \
 	&& colcon build \
 	&& cd install \
-	&& && for d in *; do if [[ -d "${d}" && ! -L "${d}" ]]; then echo "Processing ${d}..." ; rsync -a "${d}/" "/opt/ros/${ROS_VER}/" ; echo "Completed processing ${d}!" ; fi ; done \
+	&& for d in *; do if [[ -d "${d}" && ! -L "${d}" ]]; then echo "Processing ${d}..." ; rsync -a "${d}/" "/opt/ros/${ROS_VER}/" ; echo "Completed processing ${d}!" ; fi ; done \
 	&& cd / \
 	&& rm -Rf /tmp/* \
 	&& rm -rf /var/lib/apt/lists/*
