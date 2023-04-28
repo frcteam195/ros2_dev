@@ -7,8 +7,8 @@ SHELL ["/bin/sh", "-c"]
 ARG NOW
 WORKDIR /tmp
 RUN git clone https://github.com/frcteam195/container_support_files \
-	&& sed -i 's/noetic/${ROS_VER}/g' container_support_files/bash.bashrc \
-	&& sed -i 's/noetic/${ROS_VER}/g' container_support_files/zsh.zshrc \
+	&& sed -i "s/noetic/${ROS_VER}/g" container_support_files/bash.bashrc \
+	&& sed -i "s/noetic/${ROS_VER}/g" container_support_files/zsh.zshrc \
 	&& cat container_support_files/bash.bashrc > /etc/bash.bashrc \
 	&& cat container_support_files/zsh.zshrc > /etc/zsh/zshrc \
 	&& rm -Rf /root/.bashrc \
