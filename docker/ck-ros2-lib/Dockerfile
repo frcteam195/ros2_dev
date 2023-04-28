@@ -1,6 +1,7 @@
 ARG ARCH
 FROM guitar24t/ck-ros2-base:${ARCH}
 ARG DEBIAN_FRONTEND=noninteractive
+ARG ROS_VER=humble
 
 WORKDIR /tmp
 
