@@ -17,9 +17,15 @@ WORKDIR /tmp
 RUN git clone https://github.com/protocolbuffers/protobuf.git \
 	&& cd /tmp/protobuf \
 	&& git checkout 482156c0f96dd670b9f1ba4f946e66edeb04535f \
+	&& cd third_party \
+	&& rm -Rf abseil-cpp \
+	&& git clone https://github.com/abseil/abseil-cpp.git \
+	&& cd abseil-cpp \
+	&& git checkout b971ac5250ea8de900eae9f95e06548d14cd95fe \
+	&& cd /tmp/protobuf \
 	&& mkdir cppbuild \
 	&& cd /tmp/protobuf/cppbuild \
-	&& cmake ../cmake -Dprotobuf_BUILD_TESTS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+	&& cmake ../cmake -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_ABSL_PROVIDER=module -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
 	&& make -j8 \
 	&& make install \
 	&& rm -Rf /tmp/*
