@@ -60,7 +60,7 @@ RUN apt-get update \
 	&& apt-get install -y rsync \
 	&& mkdir -p /opt/ros/${ROS_VER} \
 	&& cd /ros/ros2_${ROS_VER}/install \
-	&& for d in *; do ; if [[ -d "${d}" && ! -L "${d}" ]]; then ; echo "Processing ${d}..." ; rsync -a "${d}/" "/opt/ros/${ROS_VER}/" ; echo "Completed processing ${d}!" ; fi ; done ; \
+	&& for d in *; do if [[ -d "${d}" && ! -L "${d}" ]]; then echo "Processing ${d}..." ; rsync -a "${d}/" "/opt/ros/${ROS_VER}/" ; echo "Completed processing ${d}!" ; fi ; done \
 	&& rm -rf /var/lib/apt/lists/*
 
 # RUN git clone https://github.com/stiffstream/sobjectizer \
