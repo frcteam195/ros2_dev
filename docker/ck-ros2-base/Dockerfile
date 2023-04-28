@@ -44,8 +44,8 @@ RUN apt-get update \
 RUN python3 -m pip install -U "pytest>=5.3" pytest-repeat pytest-rerunfailures \
 	&& python3 -m pip install -U flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-import-order flake8-quotes
 
-RUN  mkdir -p /tmp/ros2_${ROS_VER}/src \
-	&& cd /tmp/ros2_${ROS_VER} \
+RUN mkdir -p /ros/ros2_${ROS_VER}/src \
+	&& cd /ros/ros2_${ROS_VER} \
 	&& vcs import --input https://raw.githubusercontent.com/ros2/ros2/${ROS_VER}/ros2.repos src \
 	&& apt-get update \
 	&& rosdep init \
@@ -53,7 +53,8 @@ RUN  mkdir -p /tmp/ros2_${ROS_VER}/src \
         && rosdep install --from-paths src --ignore-src -y --skip-keys "fastcdr rti-connext-dds-6.0.1 urdfdom_headers" \
 	&& rm -rf /var/lib/apt/lists/*
 
-
+RUN cd /ros/ros2_${ROS_VER} \
+	&& colcon build --symlink-install
 
 # RUN git clone https://github.com/stiffstream/sobjectizer \
 # 	&& cd /tmp/sobjectizer \
