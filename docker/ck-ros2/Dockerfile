@@ -18,6 +18,24 @@ RUN git clone https://github.com/nlohmann/json \
 SHELL ["/bin/bash", "-c"]
 RUN mkdir -p /tmp/catkin_ws/src \
 	&& cd /tmp/catkin_ws/src \
+	&& git clone https://github.com/ros/angles.git angles2 \
+	&& cd angles2 \
+	&& git checkout ${ROS_VER}-devel \
+	&& cd .. \
+	&& mv angles2/angles ./angles \
+	&& rm -Rf angles2 \
+	&& git clone https://github.com/ros/diagnostics diagnostics2 \
+	&& cd diagnostics2 \
+	&& git checkout ros2 \
+	&& cd .. \
+	&& mv diagnostics2/diagnostic* ./ \
+	&& rm -Rf diagnostics2 \
+	&& git clone https://github.com/ros-geographic-info/geographic_info.git geographic_info2 \
+	&& cd geographic_info2 \
+	&& git checkout ros2 \
+	&& cd .. \
+	&& mv geographic_info2/geo* ./ \
+	&& rm -Rf geographic_info2 \
 	&& git clone https://github.com/frcteam195/robot_localization_ros2.git \
 	&& mv robot_localization_ros2 robot_localization \
 	&& cd robot_localization \
@@ -27,6 +45,10 @@ RUN mkdir -p /tmp/catkin_ws/src \
 	&& apt-get update \
 	&& rosdep install --from-paths src --ignore-src -r -y --skip-keys 'robot_localization' \
 	&& colcon build \
+	&& cd install \
+	&& && for d in *; do if [[ -d "${d}" && ! -L "${d}" ]]; then echo "Processing ${d}..." ; rsync -a "${d}/" "/opt/ros/${ROS_VER}/" ; echo "Completed processing ${d}!" ; fi ; done \
+	&& cd / \
+	&& rm -Rf /tmp/* \
 	&& rm -rf /var/lib/apt/lists/*
 
 
