@@ -22,7 +22,7 @@ RUN mkdir -p /tmp/catkin_ws/src \
 	&& cd angles2 \
 	&& git checkout ${ROS_VER}-devel \
 	&& cd .. \
-	&& mv angles2/angles ./angles \
+	&& mv angles2/angles ./ \
 	&& rm -Rf angles2 \
 	&& git clone https://github.com/ros/diagnostics diagnostics2 \
 	&& cd diagnostics2 \
@@ -36,14 +36,13 @@ RUN mkdir -p /tmp/catkin_ws/src \
 	&& cd .. \
 	&& mv geographic_info2/geo* ./ \
 	&& rm -Rf geographic_info2 \
-	&& git clone https://github.com/frcteam195/robot_localization_ros2.git \
-	&& mv robot_localization_ros2 robot_localization \
+	&& git clone https://github.com/frcteam195/robot_localization_ros2.git robot_localization \
 	&& cd robot_localization \
 	&& git checkout ${ROS_VER}-devel \
 	&& cd /tmp/catkin_ws \
 	&& source /opt/ros/${ROS_VER}/setup.bash \
 	&& apt-get update \
-	&& rosdep install --from-paths src --ignore-src -r -y --skip-keys 'robot_localization' \
+	&& rosdep install --from-paths src --ignore-src -r -y --skip-keys 'robot_localization angles diagnostic_updater geographic_msgs' \
 	&& colcon build \
 	&& cd install \
 	&& && for d in *; do if [[ -d "${d}" && ! -L "${d}" ]]; then echo "Processing ${d}..." ; rsync -a "${d}/" "/opt/ros/${ROS_VER}/" ; echo "Completed processing ${d}!" ; fi ; done \
