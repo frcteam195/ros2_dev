@@ -1,18 +1,10 @@
 ARG ARCH
-FROM guitar24t/ck-ros-hal:${ARCH}
+FROM guitar24t/ck-ros2-hal:${ARCH}
 ARG DEBIAN_FRONTEND=noninteractive
-ARG CMAKEVER=3.24.2
+ARG CMAKEVER=3.26.3
 RUN apt-get update \
 	&& apt-get upgrade -y \
-	&& apt-get install -y apt-utils wget software-properties-common x11-apps net-tools iputils-ping vim emacs extra-cmake-modules python-jinja2 libboost-all-dev python3-pip bash-completion nano parallel \
-	&& rm -rf /var/lib/apt/lists/*
-
-ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
-RUN echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/ros-latest.list \
-	&& apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654 \
-	&& apt-key list \
-	&& apt-get update \
-	&& apt-get -y install ros-noetic-desktop-full libsdl-dev libsdl-image1.2-dev libsuitesparse-dev ros-noetic-libg2o docker.io qemu libglfw3 libglfw3-dev \
+	&& apt-get install -y apt-utils wget software-properties-common x11-apps net-tools iputils-ping vim emacs extra-cmake-modules python-jinja2 libboost-all-dev python3-pip bash-completion nano parallel mesa-utils curl libgeographic-dev libgtest-dev clang-tidy openjdk-17-jdk libbullet-dev libsdl-dev libsdl-image1.2-dev libsuitesparse-dev libglfw3 libglfw3-dev \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN echo 'root:robots' | chpasswd
@@ -20,7 +12,7 @@ RUN echo 'root:robots' | chpasswd
 RUN mkdir /mnt/working
 WORKDIR /mnt/working
 
-RUN pip3 install -U rosdep && rosdep init && rosdep update && pip3 install -U rosinstall vcstools rospkg
+# RUN pip3 install -U rosdep && rosdep init && rosdep update && pip3 install -U rosinstall vcstools rospkg
 
 WORKDIR /tmp
 RUN git clone https://github.com/stiffstream/sobjectizer \
@@ -87,12 +79,6 @@ RUN git clone https://github.com/frcteam195/CKimgui.git \
 	&& make install \
 	&& rm -Rf /tmp/*
 
-SHELL ["/bin/bash", "-c"]
-RUN apt-get update \
-	&& apt-get install -y mesa-utils curl ros-noetic-common-msgs ros-noetic-rtabmap ros-noetic-rtabmap-ros ros-noetic-robot-localization libgeographic-dev libgtest-dev ros-noetic-turtlebot3-simulations ros-noetic-turtlebot3-gazebo ros-noetic-turtlebot3 clang-tidy ros-noetic-ddynamic-reconfigure ros-noetic-joy ros-noetic-plotjuggler-ros \
-	&& apt-get remove -y ros-noetic-teb-local-planner \
-	&& rm -rf /var/lib/apt/lists/*
-
 #Example of how to build and install a ROS package from source
 # SHELL ["/bin/bash", "-c"]
 # RUN mkdir -p /tmp/catkin_ws/src \
@@ -108,18 +94,6 @@ RUN apt-get update \
 # 	&& catkin_make install -DCMAKE_INSTALL_PREFIX=/opt/ros/noetic -DCMAKE_BUILD_TYPE=Release \
 # 	&& rm -Rf /tmp/* \
 # 	&& rm -rf /var/lib/apt/lists/*
-
-SHELL ["/bin/sh", "-c"]
-WORKDIR /tmp
-RUN git clone https://github.com/wpilibsuite/allwpilib \
-	&& cd /tmp/allwpilib \
-	&& git checkout d66555e \
-	&& mkdir build \
-	&& cd /tmp/allwpilib/build \
-	&& cmake -DWITH_JAVA=OFF -DWITH_TESTS=OFF -DWITH_CSCORE=OFF -DWITH_WPIMATH=OFF -DWITH_WPILIB=OFF -DWITH_GUI=OFF -DWITH_SIMULATION_MODULES=OFF -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=/usr/local .. \
-	&& make -j4 \
-	&& make install \
-	&& rm -Rf /tmp/*
 
 RUN curl -SLO https://github.com/Kitware/CMake/releases/download/v${CMAKEVER}/cmake-${CMAKEVER}.tar.gz \
         && tar -xzvf cmake-${CMAKEVER}.tar.gz \
@@ -142,27 +116,15 @@ RUN git clone https://github.com/GNOME/libxml2.git \
         && rm -Rf /tmp/*
 
 RUN apt-get update \
-	&& apt-get install -y openjdk-17-jdk openscenegraph libopenscenegraph-dev libbullet-dev  \
+	&& apt-get install -y locales \
+	&& locale-gen en_US en_US.UTF-8 \
+	&& update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 \
+	&& LANG=en_US.UTF-8 \
 	&& rm -rf /var/lib/apt/lists/*
 
-RUN git clone https://github.com/frcteam195/osgworks.git \
-        && cd osgworks \
-		&& git checkout osg-3.5.6 \
-        && mkdir build \
-        && cd build \
-        && cmake .. -DOpenGL_GL_PREFERENCE=GLVND -DBUILD_SHARED_LIBS=1 -DCMAKE_INSTALL_PREFIX=/usr \
-        && make -j8 \
-        && make install \
-        && cd /tmp \
-        && rm -Rf /tmp/*
+ENV LANG=en_US.UTF-8
 
-RUN git clone https://github.com/frcteam195/osgbullet.git \
-        && cd osgbullet \
-		&& git checkout osg-3.5.6 \
-        && mkdir build \
-        && cd build \
-        && cmake .. -DBUILD_SHARED_LIBS=1 -DosgWorks_DIR=/usr/lib/$(arch)-linux-gnu -DCMAKE_INSTALL_PREFIX=/usr \
-        && make -j8 \
-        && make install \
-        && cd /tmp \
-        && rm -Rf /tmp/*
+RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg \
+	&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null \
+
+

@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/l4t-base:r35.3.1
+FROM nvcr.io/nvidia/l4t-base:35.3.1
 LABEL Name="ck-ros2-hal-aarch64"
 LABEL Version="35.3.1"
 USER root
