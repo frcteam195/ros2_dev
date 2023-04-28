@@ -54,7 +54,7 @@ RUN mkdir -p /ros/ros2_${ROS_VER}/src \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN cd /ros/ros2_${ROS_VER} \
-	&& colcon build \
+	&& colcon build -DCMAKE_BUILD_TYPE=Release \
 	&& apt-get update \
 	&& apt-get install -y rsync \
 	&& git clone https://github.com/frcteam195/ros2_system_scripts.git \
