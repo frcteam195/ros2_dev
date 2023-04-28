@@ -58,7 +58,11 @@ RUN cd /ros/ros2_${ROS_VER} \
 
 RUN apt-get update \
 	&& apt-get install -y rsync \
+	&& git clone https://github.com/frcteam195/ros2_system_scripts.git \
+	&& cd ros2_system_scripts \
+	&& git checkout 2549446 \
 	&& mkdir -p /opt/ros/${ROS_VER} \
+	&& cp *setup* /opt/ros/${ROS_VER}/ \
 	&& cd /ros/ros2_${ROS_VER}/install \
 	&& for d in *; do if [[ -d "${d}" && ! -L "${d}" ]]; then echo "Processing ${d}..." ; rsync -a "${d}/" "/opt/ros/${ROS_VER}/" ; echo "Completed processing ${d}!" ; fi ; done \
 	&& rm -rf /var/lib/apt/lists/*
