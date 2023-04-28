@@ -19,13 +19,14 @@ SHELL ["/bin/bash", "-c"]
 RUN mkdir -p /tmp/catkin_ws/src \
 	&& cd /tmp/catkin_ws/src \
 	&& git clone https://github.com/frcteam195/robot_localization_ros2.git \
-	&& cd robot_localization_ros2 \
+	&& mv robot_localization_ros2 robot_localization \
+	&& cd robot_localization \
 	&& git checkout ${ROS_VER}-devel \
 	&& cd /tmp/catkin_ws \
 	&& source /opt/ros/${ROS_VER}/setup.bash \
 	&& apt-get update \
 	&& rosdep install --from-paths src --ignore-src -r -y --skip-keys 'robot_localization' \
-	&& colcon build -DCMAKE_BUILD_TYPE=Release \
+	&& colcon build \
 	&& rm -rf /var/lib/apt/lists/*
 
 
