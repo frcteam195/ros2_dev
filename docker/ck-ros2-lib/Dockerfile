@@ -119,13 +119,13 @@ RUN apt-get update \
         && apt-get install -y build-essential cmake curl git clang libclang-dev libfontconfig-dev libfreetype-dev libglib2.0-dev libgl-dev libgl1-mesa-dev libice-dev libsm-dev libssl-dev libx11-dev libx11-xcb-dev libxcb1-dev libxcb-glx0-dev libxcb-icccm4-dev libxcb-image0-dev libxcb-xinput-dev libxcb-keysyms1-dev libxcb-randr0-dev libxcb-render-util0-dev libxcb-render0-dev libxcb-shape0-dev libxcb-shm0-dev libxcb-sync-dev libxcb-util-dev libxcb-xfixes0-dev libxcb-xinerama0-dev libxcb-xinput-dev libxcb-xkb-dev libxext-dev libxfixes-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev libxrender-dev ninja-build \
         && rm -rf /var/lib/apt/lists/*
 
-RUN curl -O -L https://download.qt.io/archive/qt/6.4/6.4.0/single/qt-everywhere-src-6.4.0.tar.xz \
-	&& tar -xf qt-everywhere-src-6.4.0.tar.xz \
-	&& cd qt-everywhere-src-6.4.0/ \
+RUN curl -O -L https://download.qt.io/archive/qt/6.5/6.5.0/single/qt-everywhere-src-6.5.0.tar.xz \
+	&& tar -xf qt-everywhere-src-6.5.0.tar.xz \
+	&& cd qt-everywhere-src-6.5.0/ \
 	&& mkdir qt6-build \
 	&& cd qt6-build/ \
 	&& ../configure \
-	&& cmake --build . --parallel 4 \
+	&& cmake --build . --parallel 15 \
 	&& cmake --install . \
 	&& cd /tmp \
 	&& rm -Rf /tmp/*
@@ -134,11 +134,11 @@ RUN curl -O -L https://download.qt.io/archive/qt/6.4/6.4.0/single/qt-everywhere-
 RUN python3 -m pip install --upgrade pip setuptools wheel \
 	&& git clone https://code.qt.io/pyside/pyside-setup \
 	&& cd pyside-setup \
-	&& git checkout 6.4 \
+	&& git checkout 6.5 \
 	&& sed -i 's/pyinstaller==3.6/pyinstaller/g' requirements.txt \
 	&& python3 -m pip install -r requirements.txt \
-	&& python3 setup.py build --qtpaths=/usr/local/Qt-6.4.0/bin/qtpaths --ignore-git --parallel 4 --standalone \
-	&& python3 setup.py install --qtpaths=/usr/local/Qt-6.4.0/bin/qtpaths --ignore-git --parallel 4 --standalone --reuse-build \
+	&& python3 setup.py build --qtpaths=/usr/local/Qt-6.5.0/bin/qtpaths --ignore-git --parallel 15 --standalone \
+	&& python3 setup.py install --qtpaths=/usr/local/Qt-6.5.0/bin/qtpaths --ignore-git --parallel 15 --standalone --reuse-build \
 	&& cd /tmp \
 	&& rm -Rf /tmp/*
 
