@@ -1,6 +1,6 @@
 currdatestr := $(shell date +%mx%dx%Y)
 currdate := $(shell date +%s)
-imagename := ck-ros
+imagename := ck-ros2-lib
 armarchitecture := arm64
 x64architecture := amd64
 
@@ -22,8 +22,3 @@ dockermanifest:
 	docker manifest rm guitar24t/$(imagename) || true
 	docker manifest create guitar24t/$(imagename):latest guitar24t/$(imagename):$(x64architecture) guitar24t/$(imagename):$(armarchitecture)
 	docker manifest push guitar24t/$(imagename):latest
-
-
-
-
-

@@ -1,5 +1,5 @@
 ARG ARCH
-FROM guitar24t/ck-ros-base:${ARCH}
+FROM guitar24t/ck-ros2-lib:${ARCH}
 ARG DEBIAN_FRONTEND=noninteractive
 
 # SHELL ["/bin/bash", "-c"]
