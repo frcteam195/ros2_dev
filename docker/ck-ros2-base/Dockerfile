@@ -8,7 +8,7 @@ RUN apt-get update \
 	&& apt-get upgrade -y \
 	&& apt-get install -y apt-utils wget software-properties-common x11-apps net-tools iputils-ping vim emacs extra-cmake-modules python3-jinja2 libboost-all-dev \
 	python3-pip bash-completion nano parallel mesa-utils curl libgeographic-dev libgtest-dev clang-tidy openjdk-17-jdk libbullet-dev libsdl-dev \
-	libsdl-image1.2-dev libsuitesparse-dev libglfw3 libglfw3-dev python-is-python3 python3-flake8-docstrings python3-pytest-cov ros-dev-tools locales \
+	libsdl-image1.2-dev libsuitesparse-dev libglfw3 libglfw3-dev python-is-python3 python3-flake8-docstrings python3-pytest-cov locales \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN echo 'root:robots' | chpasswd
@@ -36,6 +36,10 @@ ENV LANG=en_US.UTF-8
 
 RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg \
 	&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
+
+RUN apt-get update \
+	&& apt-get install -y ros-dev-tools \
+	&& rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m pip install -U "pytest>=5.3" pytest-repeat pytest-rerunfailures \
 	&& python3 -m pip install -U flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-import-order flake8-quotes
