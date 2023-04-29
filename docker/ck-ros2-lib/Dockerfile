@@ -25,7 +25,7 @@ RUN git clone https://github.com/zeromq/libzmq.git \
 	&& mkdir cppbuild \
 	&& cd /tmp/libzmq/cppbuild \
 	&& cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-	&& make -j$(nproc-1) \
+	&& make -j$(nproc) \
 	&& make install \
 	&& rm -Rf /tmp/*
 
@@ -42,7 +42,7 @@ RUN git clone https://github.com/protocolbuffers/protobuf.git \
 	&& mkdir cppbuild \
 	&& cd /tmp/protobuf/cppbuild \
 	&& cmake ../cmake -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_ABSL_PROVIDER=module -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-	&& make -j$(nproc-1) \
+	&& make -j$(nproc) \
 	&& make install \
 	&& rm -Rf /tmp/*
 
@@ -51,7 +51,7 @@ RUN git clone https://github.com/GNOME/libxml2.git \
         && mkdir build \
         && cd build \
         && cmake .. -DCMAKE_INSTALL_PREFIX=/usr \
-        && make -j$(nproc-1) \
+        && make -j$(nproc) \
         && make install \
         && cd /tmp \
         && rm -Rf /tmp/*
@@ -63,7 +63,7 @@ RUN git clone https://github.com/nlohmann/json \
 	&& mkdir build \
 	&& cd build \
 	&& cmake .. \
-	&& make -j$(nproc-1) \
+	&& make -j$(nproc) \
 	&& make install \
 	&& cd /tmp \
 	&& rm -Rf /tmp/*
@@ -132,7 +132,7 @@ RUN git clone https://github.com/fmtlib/fmt.git \
 	&& mkdir cppbuild \
 	&& cd /tmp/fmt/cppbuild \
 	&& cmake .. \
-	&& make -j$(nproc-1) \
+	&& make -j$(nproc) \
 	&& make install \
 	&& rm -Rf /tmp/*
 
@@ -141,6 +141,6 @@ RUN git clone https://github.com/fmtlib/fmt.git \
 # 	&& cd /tmp/CKROSSDL \
 # 	&& git checkout 2e9821423a237a1206e3c09020778faacfe430be \
 # 	&& ./configure \
-# 	&& make -j$(nproc-1) \
+# 	&& make -j$(nproc) \
 # 	&& make install \
 # 	&& rm -Rf /tmp/*
