@@ -190,13 +190,13 @@ launch()
 	source_setup_bash
 	if [ $# -eq 0 ]
 	then
-		LAUNCH_FILE="${ROBOT_ROOT}/launch/local.launch"
+		LAUNCH_FILE="${ROBOT_ROOT}/launch/local.launch.py"
 	else
-		if [[ ${1} == *.launch ]]
+		if [[ ${1} == *.launch.py ]]
 		then
 			LAUNCH_FILE="${1}"
 		else
-			LAUNCH_FILE="${1}.launch"
+			LAUNCH_FILE="${1}.launch.py"
 		fi
 
 		if [[ ${1} != */* ]]
@@ -220,7 +220,9 @@ launch()
 		cp ${TRAJ_DIR}/*.shoe ./tmptraj/ 2>>/dev/null
 	fi
 
-	roslaunch "${LAUNCH_FILE}"
+	source "${ROBOT_ROOT}/ros2_ws/install/setup.bash"
+
+	ros2 launch "${LAUNCH_FILE}"
 }
 
 deploy()
