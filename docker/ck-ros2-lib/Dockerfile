@@ -25,7 +25,7 @@ RUN git clone https://github.com/zeromq/libzmq.git \
 	&& mkdir cppbuild \
 	&& cd /tmp/libzmq/cppbuild \
 	&& cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-	&& make -j8 \
+	&& make -j$(nproc-1) \
 	&& make install \
 	&& rm -Rf /tmp/*
 
@@ -42,7 +42,7 @@ RUN git clone https://github.com/protocolbuffers/protobuf.git \
 	&& mkdir cppbuild \
 	&& cd /tmp/protobuf/cppbuild \
 	&& cmake ../cmake -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_ABSL_PROVIDER=module -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-	&& make -j8 \
+	&& make -j$(nproc-1) \
 	&& make install \
 	&& rm -Rf /tmp/*
 
@@ -51,7 +51,7 @@ RUN git clone https://github.com/GNOME/libxml2.git \
         && mkdir build \
         && cd build \
         && cmake .. -DCMAKE_INSTALL_PREFIX=/usr \
-        && make -j8 \
+        && make -j$(nproc-1) \
         && make install \
         && cd /tmp \
         && rm -Rf /tmp/*
@@ -63,7 +63,7 @@ RUN git clone https://github.com/nlohmann/json \
 	&& mkdir build \
 	&& cd build \
 	&& cmake .. \
-	&& make -j4 \
+	&& make -j$(nproc-1) \
 	&& make install \
 	&& cd /tmp \
 	&& rm -Rf /tmp/*
@@ -125,22 +125,22 @@ RUN apt-get update \
 # 	&& cmake --build . --config Release --target install \
 # 	&& rm -Rf /tmp/*
 
-# WORKDIR /tmp
-# RUN git clone https://github.com/frcteam195/CKROSfmt.git \
-# 	&& cd /tmp/CKROSfmt \
-# 	&& git checkout d141cdbeb0fb422a3fb7173b285fd38e0d1772dc \
-# 	&& mkdir cppbuild \
-# 	&& cd /tmp/CKROSfmt/cppbuild \
-# 	&& cmake .. \
-# 	&& make -j8 \
-# 	&& make install \
-# 	&& rm -Rf /tmp/*
+WORKDIR /tmp
+RUN git clone https://github.com/fmtlib/fmt.git \
+	&& cd /tmp/fmt \
+	&& git checkout a33701196adfad74917046096bf5a2aa0ab0bb50 \
+	&& mkdir cppbuild \
+	&& cd /tmp/fmt/cppbuild \
+	&& cmake .. \
+	&& make -j$(nproc-1) \
+	&& make install \
+	&& rm -Rf /tmp/*
 
 # WORKDIR /tmp
 # RUN git clone https://github.com/frcteam195/CKROSSDL.git \
 # 	&& cd /tmp/CKROSSDL \
 # 	&& git checkout 2e9821423a237a1206e3c09020778faacfe430be \
 # 	&& ./configure \
-# 	&& make -j8 \
+# 	&& make -j$(nproc-1) \
 # 	&& make install \
 # 	&& rm -Rf /tmp/*
