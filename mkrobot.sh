@@ -2,7 +2,7 @@
 
 SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROBOT_ROOT=$(cd $SCRIPT_DIR && cd .. && cd *_Robot && pwd)
-CATKIN_WS=$(cd $SCRIPT_DIR && cd .. && cd *_Robot && cd catkin_ws && pwd)
+ROS2_WS=$(cd $SCRIPT_DIR && cd .. && cd *_Robot && cd ros2_ws && pwd)
 OS_ARCHITECTURE=$(arch)
 OS_NAME=$(uname -a)
 source "${SCRIPT_DIR}/useful_scripts.sh"
@@ -175,9 +175,9 @@ deletetag()
 
 source_setup_bash()
 {
-	if [ -f "$CATKIN_WS/devel/setup.bash" ]
+	if [ -f "$ROS2_WS/devel/setup.bash" ]
 	then
-		source ~/*_Robot/catkin_ws/devel/setup.bash
+		source ~/*_Robot/ros2_ws/devel/setup.bash
 		echo "Sourcing setup.bash"
 	else
 		echo "Can't source setup.bash"
@@ -413,9 +413,14 @@ cleanros ()
 
 	cd *_Robot/
 
-	rm -rf /mnt/working/*_Robot/catkin_ws/build/*
-	rm -rf /mnt/working/*_Robot/catkin_ws/install/*
-	rm -rf /mnt/working/*_Robot/catkin_ws/log/*
+	rm -rf /mnt/working/*_Robot/ros2_ws/build
+	rm -rf /mnt/working/*_Robot/ros2_ws/install
+	rm -rf /mnt/working/*_Robot/ros2_ws/log
+	rm -rf /mnt/working/.ros
+	cd /opt/ros/*
+	ROS_DIST_DIR=$(pwd)
+	source ${ROS_DIST_DIR}/setup.bash
+	source ${SCRIPT_DIR}/env_reset.sh
 }
 
 clean ()
@@ -446,7 +451,7 @@ build ()
 	find -name "._*" -delete
 
 	cd *_Robot
-	mkdir -p catkin_ws
+	mkdir -p ros2_ws
 	cd ..
 
 	if [ ! -f /.dockerenv ]; then
@@ -467,8 +472,8 @@ build ()
 	cd $SCRIPT_DIR/..
 
 	cd *_Robot
-	mkdir -p catkin_ws/src
-	cd catkin_ws/src
+	mkdir -p ros2_ws/src
+	cd ros2_ws/src
 	find . -maxdepth 1 | grep -v ^.$ | grep -v ^./CMakeLists.txt$ | xargs -I {} rm {}
 	find ../../.. -maxdepth 1 2>/dev/null | grep -v ^../../..$ | grep -e ".*_node" -e ".*_planner" | sed s:../../../::g | xargs -I {} ln -s ../../../{} {}
 	cd ..
@@ -485,29 +490,29 @@ mkrobot_test ()
 {
 	exit_if_not_docker
 
-	shift
+	# shift
 
-	if [ $# -eq 0 ]
-	then
-		errmsg "You must specify at least one node to test:\n\tmkrobot.sh test rio_control_node legacy_logstreamer_node"
-	fi
+	# if [ $# -eq 0 ]
+	# then
+	# 	errmsg "You must specify at least one node to test:\n\tmkrobot.sh test rio_control_node legacy_logstreamer_node"
+	# fi
 
-	cd ${CATKIN_WS}
-	catkin_make -DCMAKE_CXX_FLAGS="-Werror -Wall -Wextra" -DCATKIN_ENABLE_TESTING=1
-	BASE_COMMAND="catkin_make"
-	BASE_TEST_ARG="run_tests_"
-	FULL_ARGS="${BASE_COMMAND}"
-	for node in "$@"
-	do
-		FULL_ARGS="${FULL_ARGS} ${BASE_TEST_ARG}${node}"
-	done
-	roscore &
-	ROSCORE_ID=$!
-	sleep 2
-	echo "Running command: ${FULL_ARGS}"
-	${FULL_ARGS}
-	pkill roscore
-	wait ${ROSCORE_ID}
+	# cd ${ROS2_WS}
+	# catkin_make -DCMAKE_CXX_FLAGS="-Werror -Wall -Wextra" -DCATKIN_ENABLE_TESTING=1
+	# BASE_COMMAND="catkin_make"
+	# BASE_TEST_ARG="run_tests_"
+	# FULL_ARGS="${BASE_COMMAND}"
+	# for node in "$@"
+	# do
+	# 	FULL_ARGS="${FULL_ARGS} ${BASE_TEST_ARG}${node}"
+	# done
+	# roscore &
+	# ROSCORE_ID=$!
+	# sleep 2
+	# echo "Running command: ${FULL_ARGS}"
+	# ${FULL_ARGS}
+	# pkill roscore
+	# wait ${ROSCORE_ID}
 }
 
 
