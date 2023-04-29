@@ -22,6 +22,8 @@ RUN curl -s --compressed -o /usr/share/keyrings/ctr-pubkey.gpg "https://deb.ctr-
 	&& curl -s --compressed -o /etc/apt/sources.list.d/ctr2023.list "https://deb.ctr-electronics.com/ctr2023.list" \
 	&& apt-get update \
 	&& apt-get install -y phoenix-pro -y \
+	&& echo 'export LD_LIBRARY_PATH="/usr/lib/phoenix-pro:$LD_LIBRARY_PATH"' >> /etc/bash.bashrc \
+	&& echo 'export LD_LIBRARY_PATH="/usr/lib/phoenix-pro:$LD_LIBRARY_PATH"' >> /etc/zsh.zshrc \
 	&& rm -Rf /tmp/*
 
 WORKDIR /mnt/working
