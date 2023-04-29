@@ -115,15 +115,15 @@ RUN apt-get update \
         && rm -rf /var/lib/apt/lists/*
 
 
-# RUN git clone https://github.com/stiffstream/sobjectizer \
-# 	&& cd /tmp/sobjectizer \
-# 	&& git checkout 972b5310b7a486dd4d4322ffb46f1c7e15c47ef6 \
-# 	&& mkdir cmake_build \
-# 	&& cd /tmp/sobjectizer/cmake_build \
-# 	&& cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release ../dev \
-# 	&& cmake --build . --config Release \
-# 	&& cmake --build . --config Release --target install \
-# 	&& rm -Rf /tmp/*
+RUN git clone https://github.com/stiffstream/sobjectizer \
+	&& cd /tmp/sobjectizer \
+	&& git checkout 972b5310b7a486dd4d4322ffb46f1c7e15c47ef6 \
+	&& mkdir cmake_build \
+	&& cd /tmp/sobjectizer/cmake_build \
+	&& cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release ../dev \
+	&& cmake --build . --config Release \
+	&& cmake --build . --config Release --target install \
+	&& rm -Rf /tmp/*
 
 WORKDIR /tmp
 RUN git clone https://github.com/fmtlib/fmt.git \
@@ -136,11 +136,11 @@ RUN git clone https://github.com/fmtlib/fmt.git \
 	&& make install \
 	&& rm -Rf /tmp/*
 
-# WORKDIR /tmp
-# RUN git clone https://github.com/frcteam195/CKROSSDL.git \
-# 	&& cd /tmp/CKROSSDL \
-# 	&& git checkout 2e9821423a237a1206e3c09020778faacfe430be \
-# 	&& ./configure \
-# 	&& make -j$(nproc) \
-# 	&& make install \
-# 	&& rm -Rf /tmp/*
+WORKDIR /tmp
+RUN git clone https://github.com/frcteam195/CKROSSDL.git \
+	&& cd /tmp/CKROSSDL \
+	&& git checkout 2e9821423a237a1206e3c09020778faacfe430be \
+	&& ./configure \
+	&& make -j$(nproc) \
+	&& make install \
+	&& rm -Rf /tmp/*
