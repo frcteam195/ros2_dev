@@ -284,7 +284,6 @@ if [[ "${DOCKER_RUNNING_CMD}" -eq 1 || "${COMMAND_NEEDS_LAUNCH}" -eq 0 ]]; then
 		--volume="/etc/gshadow:/etc/gshadow:ro" \
 		--volume="/etc/passwd:/etc/passwd:ro" \
 		--volume="/etc/shadow:/etc/shadow:ro" \
-		--volume="/etc/sudoers:/etc/sudoers:ro" \
 		--volume="/usr/bin/caniv:/usr/bin/caniv:ro" \
 		${HX_CONFIG_CMD} \
 		${TRAJ_CMD} \
