@@ -48,7 +48,7 @@ DETACHED_MODE=
 DOCKER_CMD_VAR=
 FORCED_LAUNCH=
 DOCKER_RUNNING_CMD=1
-DOCKER_ARCH=arm64
+DOCKER_ARCH=latest
 
 CONTAINER_ID=$(docker ps -aql --filter "ancestor=guitar24t/ck-ros2:${DOCKER_ARCH}" --filter "status=running")
 
@@ -292,7 +292,7 @@ if [[ "${DOCKER_RUNNING_CMD}" -eq 1 || "${COMMAND_NEEDS_LAUNCH}" -eq 0 ]]; then
 		guitar24t/ck-ros2:${DOCKER_ARCH} \
 		/bin/bash
 
-	CONTAINER_ID=$(docker ps -aql --filter "ancestor=guitar24t/ck-ros2:arm64" --filter "status=running")
+	CONTAINER_ID=$(docker ps -aql --filter "ancestor=guitar24t/ck-ros2:latest" --filter "status=running")
 fi
 
 if [[ "${DOCKER_RUNNING_CMD}" -eq 0 ]]; then
