@@ -31,7 +31,7 @@ else
 	fi
 fi
 
-if [[ $(pwd) == *"ros_dev"* ]]; then
+if [[ $(pwd) == *"ros2_dev"* ]]; then
   infomsg "This script cannot be run from this directory. Attempting to fix..."
   cd ..
   if [ -d "$(pwd)/$(ls | grep *_Robot)" ]; then
@@ -213,8 +213,8 @@ if [[ "${DOCKER_RUNNING_CMD}" -eq 1 || "${COMMAND_NEEDS_LAUNCH}" -eq 0 ]]; then
 	mkdir -p "$WKSP_DIR/.vscode"
 	CURR_VSCODE1_MD5=($(md5sum ${WKSP_DIR}/.vscode/c_cpp_properties.json))
 	#CURR_VSCODE2_MD5=($(md5sum ${WKSP_DIR}/.vscode/settings.json))
-	EXP_VSCODE1_MD5=($(md5sum ${WKSP_DIR}/ros_dev/vscode_workspace_config/c_cpp_properties.json))
-	#EXP_VSCODE2_MD5=($(md5sum ${WKSP_DIR}/ros_dev/vscode_workspace_config/settings.json))
+	EXP_VSCODE1_MD5=($(md5sum ${WKSP_DIR}/ros2_dev/vscode_workspace_config/c_cpp_properties.json))
+	#EXP_VSCODE2_MD5=($(md5sum ${WKSP_DIR}/ros2_dev/vscode_workspace_config/settings.json))
 	#|| ${CURR_VSCODE2_MD5} != ${EXP_VSCODE2_MD5}
 	if [[ ${CURR_VSCODE1_MD5} != ${EXP_VSCODE1_MD5} ]]; then
 		echo "Your current cpp vscode config does not match expected. Press any key to replace config with proper config for workspace..."
@@ -222,11 +222,11 @@ if [[ "${DOCKER_RUNNING_CMD}" -eq 1 || "${COMMAND_NEEDS_LAUNCH}" -eq 0 ]]; then
 	fi
 
 	if [[ ! -f $WKSP_DIR/.vscode/settings.json ]]; then
-		cp $(pwd)/ros_dev/vscode_workspace_config/settings.json $(pwd)/.vscode/settings.json
+		cp $(pwd)/ros2_dev/vscode_workspace_config/settings.json $(pwd)/.vscode/settings.json
 	fi
 
 	rm -Rf $(pwd)/.vscode/c_cpp_properties.json
-	cp $(pwd)/ros_dev/vscode_workspace_config/c_cpp_properties.json $(pwd)/.vscode/c_cpp_properties.json
+	cp $(pwd)/ros2_dev/vscode_workspace_config/c_cpp_properties.json $(pwd)/.vscode/c_cpp_properties.json
 
 
 	cd ./*trajectories_*

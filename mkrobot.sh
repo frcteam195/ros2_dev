@@ -106,7 +106,7 @@ configurator()
 {
 	source $SCRIPT_DIR/useful_scripts.sh
 	cd $SCRIPT_DIR/..
-	/usr/bin/env python3 ./ros_dev/configurator.py
+	/usr/bin/env python3 ./ros2_dev/configurator.py
 }
 
 commit()
@@ -231,7 +231,7 @@ deploy()
 		infomsg "This command must be run in a docker container. Running in docker for you..."
 
 		cd $SCRIPT_DIR/..
-		./ros_dev/run_container.sh -f -c "/mnt/working/ros_dev/mkrobot.sh deploy"
+		./ros2_dev/run_container.sh -f -c "/mnt/working/ros2_dev/mkrobot.sh deploy"
 		return;
         fi
         exit_if_not_docker
@@ -243,7 +243,7 @@ deploy()
 	source "${BASEDIR}/useful_scripts.sh"
 	OS_ARCHITECTURE=$(arch)
 
-	if [[ $(pwd) == *"ros_dev"* ]]; then
+	if [[ $(pwd) == *"ros2_dev"* ]]; then
 	    infomsg "This script cannot be run from this directory. Attempting to fix..."
 	    cd ..
 	    if [ -d "$(pwd)/$(ls | grep *_Robot)" ]; then
@@ -399,7 +399,7 @@ cleanlibs ()
 {
 	cd $SCRIPT_DIR/..
 
-	find . -maxdepth 1 2>/dev/null | grep -v ^.$ | grep -v "^\./\." | grep -v  ".*_node" | grep -v  ".*_Robot" | grep -v third_party_libs | grep -v ros_dev | xargs -I {} sh -c "echo 'Attempting to clean {}' && cd {} && make clean"
+	find . -maxdepth 1 2>/dev/null | grep -v ^.$ | grep -v "^\./\." | grep -v  ".*_node" | grep -v  ".*_Robot" | grep -v third_party_libs | grep -v ros2_dev | xargs -I {} sh -c "echo 'Attempting to clean {}' && cd {} && make clean"
 
 	if [ -d "./third_party_libs" ]
 	then
@@ -460,7 +460,7 @@ build ()
 		infomsg "This command must be run in a docker container. Running in docker for you..."
 
 		cd $SCRIPT_DIR/..
-		./ros_dev/run_container.sh -f -c "/mnt/working/ros_dev/mkrobot.sh build"
+		./ros2_dev/run_container.sh -f -c "/mnt/working/ros2_dev/mkrobot.sh build"
 		return;
 	fi
 	exit_if_not_docker

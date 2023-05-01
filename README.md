@@ -1,4 +1,4 @@
-# ros_dev
+# ros2_dev
 
 Primarily use run_container.sh and mkrobot.sh in order to launch the docker container and build the code.
 
