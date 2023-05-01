@@ -1,6 +1,6 @@
-FROM ubuntu:22.04
+FROM ubuntu:20.04
 LABEL Name="ck-ros2-hal-amd64"
-LABEL Version="22.04"
+LABEL Version="20.04"
 USER root
 ARG DEBIAN_FRONTEND=noninteractive
 ARG GITLFSVER=3.3.0
