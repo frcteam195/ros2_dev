@@ -1,8 +1,8 @@
 currdatestr := $(shell date +%mx%dx%Y)
 currdate := $(shell date +%s)
-imagename := ck-ros-hal
-architecture := amd64
-oppositearchitecture := arm64
+imagename := ck-ros2-hal
+architecture := arm64
+oppositearchitecture := amd64
 
 docker:
 	docker build -t guitar24t/$(imagename):$(architecture) --build-arg ARCH=$(architecture) --build-arg NOW=$(currdate) .

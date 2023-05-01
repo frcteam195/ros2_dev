@@ -2,7 +2,7 @@
 
 SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROBOT_ROOT=$(cd $SCRIPT_DIR && cd .. && cd *_Robot && pwd)
-CATKIN_WS=$(cd $SCRIPT_DIR && cd .. && cd *_Robot && cd catkin_ws && pwd)
+ROS2_WS=$(cd $SCRIPT_DIR && cd .. && cd *_Robot && cd ros2_ws && pwd)
 OS_ARCHITECTURE=$(arch)
 OS_NAME=$(uname -a)
 source "${SCRIPT_DIR}/useful_scripts.sh"
@@ -175,9 +175,9 @@ deletetag()
 
 source_setup_bash()
 {
-	if [ -f "$CATKIN_WS/devel/setup.bash" ]
+	if [ -f "$ROS2_WS/devel/setup.bash" ]
 	then
-		source ~/*_Robot/catkin_ws/devel/setup.bash
+		source ~/*_Robot/ros2_ws/devel/setup.bash
 		echo "Sourcing setup.bash"
 	else
 		echo "Can't source setup.bash"
@@ -190,13 +190,13 @@ launch()
 	source_setup_bash
 	if [ $# -eq 0 ]
 	then
-		LAUNCH_FILE="${ROBOT_ROOT}/launch/local.launch"
+		LAUNCH_FILE="${ROBOT_ROOT}/launch/local.launch.py"
 	else
-		if [[ ${1} == *.launch ]]
+		if [[ ${1} == *.launch.py ]]
 		then
 			LAUNCH_FILE="${1}"
 		else
-			LAUNCH_FILE="${1}.launch"
+			LAUNCH_FILE="${1}.launch.py"
 		fi
 
 		if [[ ${1} != */* ]]
@@ -220,7 +220,9 @@ launch()
 		cp ${TRAJ_DIR}/*.shoe ./tmptraj/ 2>>/dev/null
 	fi
 
-	roslaunch "${LAUNCH_FILE}"
+	source "${ROBOT_ROOT}/ros2_ws/install/setup.bash"
+
+	ros2 launch "${LAUNCH_FILE}"
 }
 
 deploy()
@@ -412,15 +414,15 @@ cleanros ()
 	cd $SCRIPT_DIR/..
 
 	cd *_Robot/
-	mkdir -p catkin_ws/src
-	cd catkin_ws/src
-	find . -maxdepth 1 | grep -v ^.$ | grep -v ^./CMakeLists.txt$ | xargs -I {} rm {}
-	find ../../.. -maxdepth 1 2>/dev/null | grep -v ^../../..$ | grep -v ".*_Robot" | grep -v ^../../../third_party_libs$$
-	cd ..
-	catkin_make clean
 
-	rm -rf /mnt/working/*_Robot/outputs/*/build/*
-	rm -rf /mnt/working/*_Robot/outputs/*/devel/*
+	rm -rf /mnt/working/*_Robot/ros2_ws/build
+	rm -rf /mnt/working/*_Robot/ros2_ws/install
+	rm -rf /mnt/working/*_Robot/ros2_ws/log
+	rm -rf /mnt/working/.ros
+	cd /opt/ros/*
+	ROS_DIST_DIR=$(pwd)
+	source ${ROS_DIST_DIR}/setup.bash
+	source ${SCRIPT_DIR}/env_reset.sh
 }
 
 clean ()
@@ -440,229 +442,79 @@ clone ()
 
 build ()
 {
-	if [ $OS_ARCHITECTURE == 'arm64' ]
-	then
-		OS_ARCHITECTURE="aarch64"
-	fi
-
-	if [ ! $OS_ARCHITECTURE == 'aarch64' ] && [ ! -f /.dockerenv ]
-	then
-		docker run --rm --privileged multiarch/qemu-user-static --reset -p yes > /dev/null
-	fi
-
-	if [ $# -eq 0 ]
-	then
-		BUILD_ARCHITECTURE="${OS_ARCHITECTURE}"
+	IS_ROS_DEBUG=0
+	if [ -z "${1}" ]; then
+		IS_ROS_DEBUG=0
 	else
-		BUILD_ARCHITECTURE=$1
+		IS_ROS_DEBUG=${1}
 	fi
-
-	if [ $OS_ARCHITECTURE != $BUILD_ARCHITECTURE ] && [ -f /.dockerenv ]
-	then
-		errmsg "A cross compile must be run directly from the host and not inside a container."
-		exit
-	fi
-
-	case "$BUILD_ARCHITECTURE" in
-		"x86_64")
-			;;
-		"aarch64")
-			;;
-		*)
-			errmsg "Invalid architecture \"$1\" supported architectures are: x86_64 aarch64"
-			exit
-			;;
-	esac
-
-	infomsg "Targeting $BUILD_ARCHITECTURE"
 
 	cd $SCRIPT_DIR/..
 	find -name "._*" -delete
 
 	cd *_Robot
-	mkdir -p catkin_ws
+	mkdir -p ros2_ws
 	cd ..
 
-	find . | grep _Robot$ | xargs -I {} realpath {} | xargs -I {} rm -rf {}/catkin_ws/build
-	find . | grep _Robot$ | xargs -I {} realpath {} | xargs -I {} rm -rf {}/catkin_ws/devel
-
-	find . | grep _Robot$ | xargs -I {} realpath {} | xargs -I {} ln -s {}/outputs/$BUILD_ARCHITECTURE/build {}/catkin_ws/build
-	find . | grep _Robot$ | xargs -I {} realpath {} | xargs -I {} ln -s {}/outputs/$BUILD_ARCHITECTURE/devel {}/catkin_ws/devel
-
-
-	DOCKER_FLAGS=
-	case "${BUILD_ARCHITECTURE}" in
-		"x86_64")
-			DOCKER_FLAGS="-i"
-			;;
-		"aarch64")
-			DOCKER_FLAGS="-a"
-			;;
-		*)
-			;;
-	esac
-
-	if [ ${OS_ARCHITECTURE} = ${BUILD_ARCHITECTURE} ]
-	then
-		if [ ! -f /.dockerenv ]; then
-			infomsg "This command must be run in a docker container. Running in docker for you..."
-
-			cd $SCRIPT_DIR/..
-			./ros_dev/run_container.sh ${DOCKER_FLAGS} -f -c "/mnt/working/ros_dev/mkrobot.sh build ${BUILD_ARCHITECTURE}"
-			return;
-		fi
-		exit_if_not_docker
-		if [ -d "./third_party_libs" ]
-		then
-			infomsg "Making third party libraries..."
-			cd third_party_libs
-			cat ../*_Robot/third_party_projects.txt | grep -v "^#.*$" | sed s:^.*/::g | sed s:.git.*$::g | xargs -I {} sh -c "echo 'Attempting to make {}' && cd {} && if [ -f \"Makefile\" ]; then make ${BUILD_ARCHITECTURE}; fi"
-		fi
+	if [ ! -f /.dockerenv ]; then
+		infomsg "This command must be run in a docker container. Running in docker for you..."
 
 		cd $SCRIPT_DIR/..
-
-		cd *_Robot
-		mkdir -p catkin_ws/src
-		cd catkin_ws/src
-		find . -maxdepth 1 | grep -v ^.$ | grep -v ^./CMakeLists.txt$ | xargs -I {} rm {}
-		find ../../.. -maxdepth 1 2>/dev/null | grep -v ^../../..$ | grep -e ".*_node" -e ".*_planner" | sed s:../../../::g | xargs -I {} ln -s ../../../{} {}
-		cd ..
-		catkin_make -j$(($(nproc)-1)) -DROBOT_ARCHITECTURE_${OS_ARCHITECTURE^^}=TRUE -DCMAKE_CXX_FLAGS="-Werror -Wall -Wextra" -DCATKIN_ENABLE_TESTING=0
-	elif [ ${OS_ARCHITECTURE} != ${BUILD_ARCHITECTURE} ]
-	then
-		./ros_dev/run_container.sh ${DOCKER_FLAGS} -f -c "/mnt/working/ros_dev/mkrobot.sh build ${BUILD_ARCHITECTURE}"
-	else
-		errmsg "Build case not identified!"
+		./ros_dev/run_container.sh -f -c "/mnt/working/ros_dev/mkrobot.sh build"
+		return;
 	fi
+	exit_if_not_docker
+	if [ -d "./third_party_libs" ]
+	then
+		infomsg "Making third party libraries..."
+		cd third_party_libs
+		cat ../*_Robot/third_party_projects.txt | grep -v "^#.*$" | sed s:^.*/::g | sed s:.git.*$::g | xargs -I {} sh -c "echo 'Attempting to make {}' && cd {} && if [ -f \"Makefile\" ]; then make; fi"
+	fi
+
+	cd $SCRIPT_DIR/..
+
+	cd *_Robot
+	mkdir -p ros2_ws/src
+	cd ros2_ws/src
+	find . -maxdepth 1 | grep -v ^.$ | grep -v ^./CMakeLists.txt$ | xargs -I {} rm {}
+	find ../../.. -maxdepth 1 2>/dev/null | grep -v ^../../..$ | grep -e ".*_node" -e ".*_planner" | sed s:../../../::g | xargs -I {} ln -s ../../../{} {}
+	cd ..
+	colcon build --cmake-args '-DCMAKE_CXX_FLAGS=-Werror -Wall -Wextra' "-DBUILD_TESTING=${IS_ROS_DEBUG}"
 
 }
 
 builddebug ()
 {
-	if [ $OS_ARCHITECTURE == 'arm64' ]
-	then
-		OS_ARCHITECTURE="aarch64"
-	fi
-
-	if [ ! $OS_ARCHITECTURE == 'aarch64' ] && [ ! -f /.dockerenv ]
-	then
-		docker run --rm --privileged multiarch/qemu-user-static --reset -p yes > /dev/null
-	fi
-
-	if [ $# -eq 0 ]
-	then
-		BUILD_ARCHITECTURE="${OS_ARCHITECTURE}"
-	else
-		BUILD_ARCHITECTURE=$1
-	fi
-
-	if [ $OS_ARCHITECTURE != $BUILD_ARCHITECTURE ] && [ -f /.dockerenv ]
-	then
-		errmsg "A cross compile must be run directly from the host and not inside a container."
-		exit
-	fi
-
-	case "$BUILD_ARCHITECTURE" in
-		"x86_64")
-			;;
-		"aarch64")
-			;;
-		*)
-			errmsg "Invalid architecture \"$1\" supported architectures are: x86_64 aarch64"
-			exit
-			;;
-	esac
-
-	infomsg "Targeting $BUILD_ARCHITECTURE"
-
-	cd $SCRIPT_DIR/..
-	find -name "._*" -delete
-
-	cd *_Robot
-	mkdir -p catkin_ws
-	cd ..
-
-	find . | grep _Robot$ | xargs -I {} realpath {} | xargs -I {} rm -rf {}/catkin_ws/build
-	find . | grep _Robot$ | xargs -I {} realpath {} | xargs -I {} rm -rf {}/catkin_ws/devel
-
-	find . | grep _Robot$ | xargs -I {} realpath {} | xargs -I {} ln -s {}/outputs/$BUILD_ARCHITECTURE/build {}/catkin_ws/build
-	find . | grep _Robot$ | xargs -I {} realpath {} | xargs -I {} ln -s {}/outputs/$BUILD_ARCHITECTURE/devel {}/catkin_ws/devel
-
-
-	DOCKER_FLAGS=
-	case "${BUILD_ARCHITECTURE}" in
-		"x86_64")
-			DOCKER_FLAGS="-i"
-			;;
-		"aarch64")
-			DOCKER_FLAGS="-a"
-			;;
-		*)
-			;;
-	esac
-
-	if [ ${OS_ARCHITECTURE} = ${BUILD_ARCHITECTURE} ]
-	then
-		if [ ! -f /.dockerenv ]; then
-			infomsg "This command must be run in a docker container. Running in docker for you..."
-
-			cd $SCRIPT_DIR/..
-			./ros_dev/run_container.sh ${DOCKER_FLAGS} -f -c "/mnt/working/ros_dev/mkrobot.sh build ${BUILD_ARCHITECTURE}"
-			return;
-		fi
-		exit_if_not_docker
-		if [ -d "./third_party_libs" ]
-		then
-			infomsg "Making third party libraries..."
-			cd third_party_libs
-			cat ../*_Robot/third_party_projects.txt | grep -v "^#.*$" | sed s:^.*/::g | sed s:.git.*$::g | xargs -I {} sh -c "echo 'Attempting to make {}' && cd {} && if [ -f \"Makefile\" ]; then make ${BUILD_ARCHITECTURE}; fi"
-		fi
-
-		cd $SCRIPT_DIR/..
-
-		cd *_Robot
-		mkdir -p catkin_ws/src
-		cd catkin_ws/src
-		find . -maxdepth 1 | grep -v ^.$ | grep -v ^./CMakeLists.txt$ | xargs -I {} rm {}
-		find ../../.. -maxdepth 1 2>/dev/null | grep -v ^../../..$ | grep -e ".*_node" -e ".*_planner" | sed s:../../../::g | xargs -I {} ln -s ../../../{} {}
-		cd ..
-		catkin_make -j$(($(nproc)-1)) -DROBOT_ARCHITECTURE_${OS_ARCHITECTURE^^}=TRUE -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Werror -Wall -Wextra" -DCATKIN_ENABLE_TESTING=0
-	elif [ ${OS_ARCHITECTURE} != ${BUILD_ARCHITECTURE} ]
-	then
-		./ros_dev/run_container.sh ${DOCKER_FLAGS} -f -c "/mnt/working/ros_dev/mkrobot.sh build ${BUILD_ARCHITECTURE}"
-	else
-		errmsg "Build case not identified!"
-	fi
-
+	build 1
 }
 
 mkrobot_test ()
 {
 	exit_if_not_docker
 
-	shift
+	# shift
 
-	if [ $# -eq 0 ]
-	then
-		errmsg "You must specify at least one node to test:\n\tmkrobot.sh test rio_control_node legacy_logstreamer_node"
-	fi
+	# if [ $# -eq 0 ]
+	# then
+	# 	errmsg "You must specify at least one node to test:\n\tmkrobot.sh test rio_control_node legacy_logstreamer_node"
+	# fi
 
-	cd ${CATKIN_WS}
-	catkin_make -DCMAKE_CXX_FLAGS="-Werror -Wall -Wextra" -DCATKIN_ENABLE_TESTING=1
-	BASE_COMMAND="catkin_make"
-	BASE_TEST_ARG="run_tests_"
-	FULL_ARGS="${BASE_COMMAND}"
-	for node in "$@"
-	do
-		FULL_ARGS="${FULL_ARGS} ${BASE_TEST_ARG}${node}"
-	done
-	roscore &
-	ROSCORE_ID=$!
-	sleep 2
-	echo "Running command: ${FULL_ARGS}"
-	${FULL_ARGS}
-	pkill roscore
-	wait ${ROSCORE_ID}
+	# cd ${ROS2_WS}
+	# catkin_make -DCMAKE_CXX_FLAGS="-Werror -Wall -Wextra" -DCATKIN_ENABLE_TESTING=1
+	# BASE_COMMAND="catkin_make"
+	# BASE_TEST_ARG="run_tests_"
+	# FULL_ARGS="${BASE_COMMAND}"
+	# for node in "$@"
+	# do
+	# 	FULL_ARGS="${FULL_ARGS} ${BASE_TEST_ARG}${node}"
+	# done
+	# roscore &
+	# ROSCORE_ID=$!
+	# sleep 2
+	# echo "Running command: ${FULL_ARGS}"
+	# ${FULL_ARGS}
+	# pkill roscore
+	# wait ${ROSCORE_ID}
 }
 
 

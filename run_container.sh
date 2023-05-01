@@ -1,7 +1,7 @@
 #!/bin/bash
 #################################################
 #run_container.sh
-#Version 2022.01.19
+#Version 2023.04.28
 #Authors: FRC Team 195
 #################################################
 
@@ -48,9 +48,9 @@ DETACHED_MODE=
 DOCKER_CMD_VAR=
 FORCED_LAUNCH=
 DOCKER_RUNNING_CMD=1
-DOCKER_ARCH=latest
+DOCKER_ARCH=arm64
 
-CONTAINER_ID=$(docker ps -aql --filter "ancestor=guitar24t/ck-ros:${DOCKER_ARCH}" --filter "status=running")
+CONTAINER_ID=$(docker ps -aql --filter "ancestor=guitar24t/ck-ros2:${DOCKER_ARCH}" --filter "status=running")
 
 usage() { infomsg "Usage: ${0} [-a] [-d] [-k] [-h] [-c <string>]\n\t-a Force arm64 docker container\n\t-i Force x86_64 docker container\n\t-d Run docker container in detached mode\n\t-k Kill running docker instance\n\t-c <string> Run a command in the docker container\n\t-h Display this help text \n\n" 1>&2; exit 1; }
 while getopts "ac:dfhik" o; do
@@ -58,7 +58,7 @@ while getopts "ac:dfhik" o; do
 		a)
 			DOCKER_ARCH=arm64
 			if [ ${INET_ONLINE} -eq 0 ]; then
-				docker pull guitar24t/ck-ros:arm64 || true
+				docker pull guitar24t/ck-ros2:arm64 || true
 			fi
 			;;
         d)
@@ -70,7 +70,7 @@ while getopts "ac:dfhik" o; do
 		i)	
 			DOCKER_ARCH=amd64
 			if [ ${INET_ONLINE} -eq 0 ]; then
-				docker pull guitar24t/ck-ros:amd64 || true
+				docker pull guitar24t/ck-ros2:amd64 || true
 			fi
 			;;
 		k)
@@ -97,7 +97,7 @@ while getopts "ac:dfhik" o; do
 done
 shift $((OPTIND-1))
 
-CONTAINER_ID=$(docker ps -aql --filter "ancestor=guitar24t/ck-ros:${DOCKER_ARCH}" --filter "status=running")
+CONTAINER_ID=$(docker ps -aql --filter "ancestor=guitar24t/ck-ros2:${DOCKER_ARCH}" --filter "status=running")
 
 #TODO: Figure out why we did this
 #if [ ${DOCKER_ARCH} == "latest" ] && [ ! -z ${FORCED_LAUNCH} ]
@@ -192,7 +192,7 @@ fi
 
 if [ ${INET_ONLINE} -eq 0 ]; then
 	infomsg "Checking for container updates..."
-	docker pull guitar24t/ck-ros:${DOCKER_ARCH} || true
+	docker pull guitar24t/ck-ros2:${DOCKER_ARCH} || true
 fi
 
 if [ ! -z "${DETACHED_MODE}" ];
@@ -284,14 +284,15 @@ if [[ "${DOCKER_RUNNING_CMD}" -eq 1 || "${COMMAND_NEEDS_LAUNCH}" -eq 0 ]]; then
 		--volume="/etc/gshadow:/etc/gshadow:ro" \
 		--volume="/etc/passwd:/etc/passwd:ro" \
 		--volume="/etc/shadow:/etc/shadow:ro" \
+		--volume="/usr/bin/caniv:/usr/bin/caniv:ro" \
 		${HX_CONFIG_CMD} \
 		${TRAJ_CMD} \
 		--net=host \
 		-e HOME=/mnt/working \
-		guitar24t/ck-ros:${DOCKER_ARCH} \
+		guitar24t/ck-ros2:${DOCKER_ARCH} \
 		/bin/bash
 
-	CONTAINER_ID=$(docker ps -aql --filter "ancestor=guitar24t/ck-ros:latest" --filter "status=running")
+	CONTAINER_ID=$(docker ps -aql --filter "ancestor=guitar24t/ck-ros2:arm64" --filter "status=running")
 fi
 
 if [[ "${DOCKER_RUNNING_CMD}" -eq 0 ]]; then

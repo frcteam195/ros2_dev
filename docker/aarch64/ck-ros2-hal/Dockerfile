@@ -1,9 +1,9 @@
-FROM nvcr.io/nvidia/l4t-base:r35.2.1
-LABEL Name="ck-ros-hal-aarch64"
-LABEL Version="35.2.1"
+FROM nvcr.io/nvidia/l4t-base:35.3.1
+LABEL Name="ck-ros2-hal-aarch64"
+LABEL Version="35.3.1"
 USER root
 ARG DEBIAN_FRONTEND=noninteractive
-ARG GITLFSVER=3.2.0
+ARG GITLFSVER=3.3.0
 WORKDIR /tmp
 RUN apt-get update \
 	&& apt-get install -y apt-utils \
@@ -37,22 +37,5 @@ RUN add-apt-repository ppa:git-core/ppa \
 	&& apt-mark hold git-lfs \
 	&& rm -Rf /tmp/* \
 	&& rm -rf /var/lib/apt/lists/*
-
-# RUN git clone https://github.com/IntelRealSense/librealsense \
-# 	&& cd librealsense \
-# 	&& git checkout c94410a420b74e5fb6a414bd12215c05ddd82b69 \
-# 	&& chmod +x ./scripts/* \
-# 	&& cp ./config/99-realsense-libusb.rules /lib/udev/rules.d/ \
-# 	&& mkdir build \
-# 	&& cd build \
-# 	&& cmake .. -DBUILD_EXAMPLES=true -DCMAKE_BUILD_TYPE=release -DFORCE_RSUSB_BACKEND=true -DBUILD_WITH_CUDA=true \
-# 	&& make -j$(($(nproc)-1)) \
-# 	&& make install \
-# 	&& cd / \
-# 	&& rm -Rf /tmp/* \
-# 	&& rm -rf /var/lib/apt/lists/* \
-# 	&& ldconfig
-
-# RUN udevadm control --reload-rules; udevadm trigger
 
 WORKDIR /

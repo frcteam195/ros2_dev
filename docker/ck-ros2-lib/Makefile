@@ -1,6 +1,6 @@
 currdatestr := $(shell date +%mx%dx%Y)
 currdate := $(shell date +%s)
-imagename := ck-ros-base
+imagename := ck-ros2-lib
 armarchitecture := arm64
 x64architecture := amd64
 
