@@ -45,3 +45,17 @@ exit_if_not_docker()
 		errmsg 'This must be run inside a docker container.'
 	fi
 }
+
+flatten_trajectories()
+{
+	cd ./*trajectories_* 2>> /dev/null
+	if [ $? -eq 0 ]; then
+		TRAJ_DIR=$(pwd)
+		cd ..
+		echo "Deploying Trajectories..."
+		mkdir -p ./tmptraj
+		rm -Rf ./tmptraj/**
+		cp ${TRAJ_DIR}/**/*.shoe ./tmptraj/
+		cp ${TRAJ_DIR}/*.shoe ./tmptraj/ 2>>/dev/null
+	fi
+}

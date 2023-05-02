@@ -7,25 +7,25 @@
 
 
 BASEDIR=$(dirname "${0}")
-source "${BASEDIR}/useful_scripts.sh"
+source "${BASEDIR}/support_scripts/useful_scripts.sh"
 INET_ONLINE=$(timeout 0.5s ping -c1 8.8.8.8 > /dev/null; echo ${?})
 
 if [ ! -f "${BASEDIR}/../.bash_completion" ]; then
 	echo '#!/bin/bash' > "${BASEDIR}/../.bash_completion"
 	echo -e "\n" >> "${BASEDIR}/../.bash_completion"
-	cat "${BASEDIR}/bash_completion.sh" >> "${BASEDIR}/../.bash_completion"
+	cat "${BASEDIR}/support_scripts/bash_completion.sh" >> "${BASEDIR}/../.bash_completion"
 	echo -e "\n" >> "${BASEDIR}/../.bash_completion"
 	chmod +x "${BASEDIR}/../.bash_completion"
 	infomsg "Installed bash completions"
 else
-	NEW_COMPLETIONS=$(<"${BASEDIR}/bash_completion.sh")
+	NEW_COMPLETIONS=$(<"${BASEDIR}/support_scripts/bash_completion.sh")
 	CURR_COMPLETIONS=$(<"${BASEDIR}/../.bash_completion")
 	if [[ ${CURR_COMPLETIONS} = *"${NEW_COMPLETIONS}"* ]];
 	then
 		infomsg "Bash completions already installed"
 	else
 		echo -e "\n" >> "${BASEDIR}/../.bash_completion"
-		cat "${BASEDIR}/bash_completion.sh" >> "${BASEDIR}/../.bash_completion"
+		cat "${BASEDIR}/support_scripts/bash_completion.sh" >> "${BASEDIR}/../.bash_completion"
 		echo -e "\n" >> "${BASEDIR}/../.bash_completion"
 		infomsg "Bash completions installed to your already existing completion script"
 	fi
@@ -229,20 +229,7 @@ if [[ "${DOCKER_RUNNING_CMD}" -eq 1 || "${COMMAND_NEEDS_LAUNCH}" -eq 0 ]]; then
 	cp $(pwd)/ros2_dev/vscode_workspace_config/c_cpp_properties.json $(pwd)/.vscode/c_cpp_properties.json
 
 
-	cd ./*trajectories_*
-	if [ $? -eq 0 ]; then
-		TRAJ_DIR=$(pwd)
-		cd ..
-		echo "Mapping Trajectories..."
-		mkdir -p ./tmptraj
-		rm -Rf ./tmptraj/**
-		# cp ${TRAJ_DIR}/**/*.json ./tmptraj/
-		# cp ${TRAJ_DIR}/*.json ./tmptraj/ 2>>/dev/null
-		cp ${TRAJ_DIR}/**/*.shoe ./tmptraj/
-		cp ${TRAJ_DIR}/*.shoe ./tmptraj/ 2>>/dev/null
-	else
-		echo "No trajectories found"
-	fi
+	flatten_trajectories
 
 	TRAJ_CMD=
 	if [[ "${TRAJ_DIR}" != 0 ]]; then

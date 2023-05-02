@@ -5,7 +5,7 @@ ROBOT_ROOT=$(cd $SCRIPT_DIR && cd .. && cd *_Robot && pwd)
 ROS2_WS=$(cd $SCRIPT_DIR && cd .. && cd *_Robot && cd ros2_ws && pwd)
 OS_ARCHITECTURE=$(arch)
 OS_NAME=$(uname -a)
-source "${SCRIPT_DIR}/useful_scripts.sh"
+source "${SCRIPT_DIR}/support_scripts/useful_scripts.sh"
 
 help_text ()
 {
@@ -175,10 +175,9 @@ deletetag()
 
 source_setup_bash()
 {
-	if [ -f "$ROS2_WS/devel/setup.bash" ]
+	if [ -f "${ROS2_WS}/install/setup.bash" ]
 	then
-		source ~/*_Robot/ros2_ws/devel/setup.bash
-		echo "Sourcing setup.bash"
+		source ${ROS2_WS}/install/setup.bash
 	else
 		echo "Can't source setup.bash"
 		echo "Is robot built properly?"
@@ -207,18 +206,7 @@ launch()
 	echo "Using launchfile ${LAUNCH_FILE}"
 
 	cd ${SCRIPT_DIR}/..
-	cd ./*trajectories_*
-	if [ $? -eq 0 ]; then
-		TRAJ_DIR=$(pwd)
-		cd ..
-		echo "Deploying Trajectories..."
-		mkdir -p ./tmptraj
-		rm -Rf ./tmptraj/**
-		# cp ${TRAJ_DIR}/**/*.json ./tmptraj/
-		# cp ${TRAJ_DIR}/*.json ./tmptraj/ 2>>/dev/null
-		cp ${TRAJ_DIR}/**/*.shoe ./tmptraj/
-		cp ${TRAJ_DIR}/*.shoe ./tmptraj/ 2>>/dev/null
-	fi
+	flatten_trajectories
 
 	source "${ROBOT_ROOT}/ros2_ws/install/setup.bash"
 
@@ -265,23 +253,13 @@ deploy()
 	#cd ${FULL_ROSLIB_PATH}
 	cd ${BASE_PATH}/..
 
-	cd ./*trajectories_*
-	if [ $? -eq 0 ]; then
-		TRAJ_DIR=$(pwd)
-		cd ..
-		echo "Deploying Trajectories..."
-		mkdir -p ./tmptraj
-		rm -Rf ./tmptraj/**
-		# cp ${TRAJ_DIR}/**/*.json ./tmptraj/
-		# cp ${TRAJ_DIR}/*.json ./tmptraj/ 2>>/dev/null
-		cp ${TRAJ_DIR}/**/*.shoe ./tmptraj/
-		cp ${TRAJ_DIR}/*.shoe ./tmptraj/ 2>>/dev/null
+	flatten_trajectories
 
+	cd ./*trajectories_* 2>> /dev/null
+	if [ $? -eq 0 ]; then
+		cd ..
 		ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no team195@${TARGET_IP} 'rm -Rf /robot/trajectories/* && mkdir -p /robot/trajectories && chown team195:team195 /robot/trajectories'
-		# scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ./tmptraj/*.json team195@${TARGET_IP}:/robot/trajectories
 		scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ./tmptraj/*.shoe team195@${TARGET_IP}:/robot/trajectories
-	else
-		echo "No trajectories found"
 	fi
 
 	echo "Cleaning PyCache..."
