@@ -228,7 +228,6 @@ deploy()
 
 	BASEDIR=$(dirname "$0")
 	ROOT_DIR=$(realpath $(dirname ${BASEDIR}))
-	source "${BASEDIR}/useful_scripts.sh"
 	OS_ARCHITECTURE=$(arch)
 
 	if [[ $(pwd) == *"ros2_dev"* ]]; then
