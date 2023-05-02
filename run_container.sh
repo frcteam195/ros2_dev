@@ -47,13 +47,14 @@ exit_if_macOS
 DETACHED_MODE=
 DOCKER_CMD_VAR=
 FORCED_LAUNCH=
+SUDO_MODE=
 DOCKER_RUNNING_CMD=1
 DOCKER_ARCH=latest
 
 CONTAINER_ID=$(docker ps -aql --filter "ancestor=guitar24t/ck-ros2:${DOCKER_ARCH}" --filter "status=running")
 
-usage() { infomsg "Usage: ${0} [-a] [-d] [-k] [-h] [-c <string>]\n\t-a Force arm64 docker container\n\t-i Force x86_64 docker container\n\t-d Run docker container in detached mode\n\t-k Kill running docker instance\n\t-c <string> Run a command in the docker container\n\t-h Display this help text \n\n" 1>&2; exit 1; }
-while getopts "ac:dfhik" o; do
+usage() { infomsg "Usage: ${0} [-a] [-d] [-k] [-h] [-r] [-c <string>]\n\t-a Force arm64 docker container\n\t-i Force x86_64 docker container\n\t-d Run docker container in detached mode\n\t-k Kill running docker instance\n\t-r Sudo access mapping\n\t-c <string> Run a command in the docker container\n\t-h Display this help text \n\n" 1>&2; exit 1; }
+while getopts "ac:dfhikr" o; do
     case "${o}" in
 		a)
 			DOCKER_ARCH=arm64
@@ -83,6 +84,9 @@ while getopts "ac:dfhik" o; do
 			fi
 			errmsg "No docker container found to kill!" noexit
 			usage
+			;;
+		r)
+			SUDO_MODE=--volume="/etc/sudoers:/etc/sudoers:ro"
 			;;
         c)
             DOCKER_RUNNING_CMD=0
@@ -271,6 +275,7 @@ if [[ "${DOCKER_RUNNING_CMD}" -eq 1 || "${COMMAND_NEEDS_LAUNCH}" -eq 0 ]]; then
 		--volume="/etc/gshadow:/etc/gshadow:ro" \
 		--volume="/etc/passwd:/etc/passwd:ro" \
 		--volume="/etc/shadow:/etc/shadow:ro" \
+		${SUDO_MODE} \
 		--volume="/usr/bin/caniv:/usr/bin/caniv:ro" \
 		${HX_CONFIG_CMD} \
 		${TRAJ_CMD} \
