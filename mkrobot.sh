@@ -400,7 +400,7 @@ cleanros ()
 	cd /opt/ros/*
 	ROS_DIST_DIR=$(pwd)
 	source ${ROS_DIST_DIR}/setup.bash
-	source ${SCRIPT_DIR}/env_reset.sh
+	source ${SCRIPT_DIR}/support_scripts/env_reset.sh
 }
 
 clean ()
