@@ -1,7 +1,7 @@
 ARG ARCH
 FROM guitar24t/ck-ros2-base:${ARCH}
 ARG DEBIAN_FRONTEND=noninteractive
-ARG ROS_VER=humble
+ARG ROS_VER=iron
 
 WORKDIR /tmp
 
@@ -89,7 +89,7 @@ RUN mkdir -p /tmp/catkin_ws/src \
 	&& cd /tmp/catkin_ws/src \
 	&& git clone https://github.com/ros/angles.git angles2 \
 	&& cd angles2 \
-	&& git checkout ${ROS_VER}-devel \
+	&& git checkout ros2 \
 	&& cd .. \
 	&& mv angles2/angles ./ \
 	&& rm -Rf angles2 \
@@ -107,7 +107,7 @@ RUN mkdir -p /tmp/catkin_ws/src \
 	&& rm -Rf geographic_info2 \
 	&& git clone https://github.com/frcteam195/robot_localization_ros2.git robot_localization \
 	&& cd robot_localization \
-	&& git checkout ${ROS_VER}-devel \
+	&& git checkout ros2 \
 	&& cd /tmp/catkin_ws \
 	&& source /opt/ros/${ROS_VER}/setup.bash \
 	&& apt-get update \

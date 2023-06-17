@@ -2,7 +2,7 @@ ARG ARCH
 FROM guitar24t/ck-ros2-hal:${ARCH}
 ARG DEBIAN_FRONTEND=noninteractive
 ARG CMAKEVER=3.26.3
-ARG ROS_VER=humble
+ARG ROS_VER=iron
 ENV ROS_PYTHON_VERSION=3
 RUN apt-get update \
 	&& apt-get upgrade -y \
