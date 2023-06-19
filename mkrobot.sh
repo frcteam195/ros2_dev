@@ -306,9 +306,18 @@ node()
 	mv src/tt_node.cpp "src/${1}.cpp"
 	mv "include/${1}/tt_node.hpp" "include/${1}/${1}.hpp"
 
+	#create config file
+	cd $SCRIPT_DIR/..
+	cd *_Robot
+	cd config
+	echo "${1}:" >> "${1}.yaml"
+	echo "  ros__parameters:" >> "${1}.yaml"
+	echo "    example_param: 1" >> "${1}.yaml"
+
 	if [ -z "${2}" ]; then
 		return
 	fi
+
 	cd $SCRIPT_DIR/..
 	git clone "${2}" temp_repo
 	shopt -s dotglob
