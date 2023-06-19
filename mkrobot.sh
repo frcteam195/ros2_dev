@@ -352,7 +352,6 @@ node_python()
 	fi
 
 	node_name=${1}
-	class_name=$(echo "$node_name" | sed -e "s/_/ /g" | sed -e "s/\b\(.\)/\u\1/g" | sed "s/[[:blank:]]//g")
 
 	cd $SCRIPT_DIR/..
 	git clone git@github.com:frcteam195/template_python_node.git
@@ -361,9 +360,19 @@ node_python()
 	mv template_python_node/ "$node_name/"
 	cd $node_name
 	find . -type f | grep -v ^.$ | xargs sed -i "s/template_python_node/$node_name/g"
-	find . -type f | grep -v ^.$ | xargs sed -i "s/TemplatePythonNode/$class_name/g"
-	mv scripts/template_python_node scripts/$node_name
-	mv src/template_python_node src/$node_name
+	mv template_python_node "${node_name}"
+	mv "${node_name}/template_python_node.py" "${node_name}/${node_name}.py"
+	mv "resource/template_python_node" "resource/${node_name}"
+
+
+	#create config file
+	cd $SCRIPT_DIR/..
+	cd *_Robot
+	cd config
+	echo "${1}:" >> "${1}.yaml"
+	echo "  ros__parameters:" >> "${1}.yaml"
+	echo "    example_param: 1" >> "${1}.yaml"
+
 
 	if [ -z "${2}" ]; then
 		return
