@@ -299,13 +299,12 @@ node()
 	rm -Rf template_node/.git
 
 	mv template_node/ "${1}/"
-	cd ${1}
+	cd "${1}"
+	mv include/tt_node "include/${1}/"
 	find . -type f | grep -v ^.$ | xargs sed -i "s/tt_node/${1}/g"
 	find . -type f | grep -v ^.$ | xargs sed -i "s/template_node/${1}/g"
 	mv src/tt_node.cpp "src/${1}.cpp"
-	mv include/tt_node.hpp "include/${1}.hpp"
-	mv test/src/test_tt_node.cpp "test/src/test_${1}.cpp"
-	mv test/include/test_tt_node.hpp "test/include/test_${1}.hpp"
+	mv "include/${1}/tt_node.hpp" "include/${1}/${1}.hpp"
 
 	if [ -z "${2}" ]; then
 		return
