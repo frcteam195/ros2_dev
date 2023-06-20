@@ -300,11 +300,10 @@ node()
 
 	mv template_node/ "${1}/"
 	cd "${1}"
-	mv include/tt_node "include/${1}/"
-	find . -type f | grep -v ^.$ | xargs sed -i "s/tt_node/${1}/g"
+	mv include/template_node "include/${1}/"
 	find . -type f | grep -v ^.$ | xargs sed -i "s/template_node/${1}/g"
-	mv src/tt_node.cpp "src/${1}.cpp"
-	mv "include/${1}/tt_node.hpp" "include/${1}/${1}.hpp"
+	mv src/template_node.cpp "src/${1}.cpp"
+	mv "include/${1}/template_node.hpp" "include/${1}/${1}.hpp"
 
 	#create config file
 	cd $SCRIPT_DIR/..
