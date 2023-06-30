@@ -105,6 +105,10 @@ RUN mkdir -p /tmp/catkin_ws/src \
 	&& cd .. \
 	&& mv geographic_info2/geo* ./ \
 	&& rm -Rf geographic_info2 \
+	&& sudo pip3 install transforms3d \
+        && git clone https://github.com/frcteam195/tf_transformations tf_transformations2 \
+        && cd tf_transformations2 \
+        && cd .. \
 	&& git clone https://github.com/frcteam195/robot_localization_ros2.git robot_localization \
 	&& cd robot_localization \
 	&& git checkout ros2 \
