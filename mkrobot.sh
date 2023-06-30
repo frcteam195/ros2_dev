@@ -269,7 +269,7 @@ deploy()
 	echo "Deploying robot to target..."
 	scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no rosdeploy.tar.gz  team195@${TARGET_IP}:/robot
 	echo "Unpacking robot on target..."
-	ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no team195@${TARGET_IP} '/robot/ros_scripts/unpackros.sh'
+	ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no team195@${TARGET_IP} '/robot/ros2_scripts/unpackros.sh'
 	echo "Done!"
 }
 
